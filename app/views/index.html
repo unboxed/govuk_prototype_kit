@@ -11,54 +11,26 @@
     <div class="column-two-thirds">
 
       <h1 class="heading-xlarge">
-        The GOV.UK prototype kit
-        <span class="heading-secondary">{{releaseVersion}}</span>
+        Components prototypes
       </h1>{{releaseVersion | log }}
-      <p>
-        This kit lets you rapidly create HTML prototypes of GOV.UK services.
-      </p>
 
-      <p>
-        It contains all you need to prototype anything from simple static pages to complex, data-driven transactions.
-      </p>
+      <h2 class="heading-large">Character count</h2>
+      <p>Display a character / word count limit that counts down as users type in to a field. If the user goes over the limit, it counts up.</p>
 
-      <h2 class="heading-medium">About this page</h2>
+      <div class="form-group">
+        <a class="button button-start" href="components/char-count" role="button">View demo</a>
+      </div>
 
-      <p>We recommend you add links to your prototype to this page, rather than delete it.
-        You'll find this page in the kit at '/app/views/index.html'.</p>
-      <p>You can change the service name by editing the file '/app/config.js'.</p>
+      <h3 class="heading-medium">Variations</h3>
+      <ul class="list list-bullet">
+        <li><a href="components/word-count">Word count demo</a></li>
+        <li><a href="components/char-count-threshold">Character count with threshold demo</a></li>
+        <li><a href="components/char-count-highlight">Character count with highlight demo</a></li>
+      </ul>
 
-			<h2 class="heading-medium">Examples and documentation</h2>
-
-			<ul class="list list-bullet">
-				<li><a href="/docs/tutorials-and-examples">Example pages and documentation</a></li>
-				<li><a href="https://github.com/alphagov/govuk_prototype_kit">GitHub</a></li>
-			</ul>
-
-      <h2 class="heading-medium">Other resources</h2>
-
-			<ul class="list list-bullet">
-				<li>
-					<a href="https://govuk-elements.herokuapp.com/snippets/">
-						Guide to GOV.UK Elements
-					</a>
-				</li>
-				<li>
-					<a href="https://www.gov.uk/service-manual">
-						Service design manual
-					</a>
-				</li>
-				<li>
-					<a href="https://www.gov.uk/design-principles">
-						Government Digital Service Design Principles
-					</a>
-				</li>
-			</ul>
 
     </div>
   </div>
 </main>
 
 {% endblock %}
-
-

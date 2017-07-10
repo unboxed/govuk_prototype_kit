@@ -16,4 +16,23 @@ $(document).ready(function () {
   // to toggle hidden content
   var showHideContent = new GOVUK.ShowHideContent()
   showHideContent.init()
+
+  // Character/Word Count
+  var charCount = new GOVUK.CharCount()
+  charCount.init({
+    selector: 'js-char-count',
+  })
+  charCount.init({
+    selector: 'js-char-count-threshold',
+    threshold: 50
+  })
+  charCount.init({
+    selector: 'js-char-count-highlight',
+    highlight: true,
+  })
+  charCount.init({
+    selector: 'js-word-count',
+    wordCount: true,
+  })
+
 })

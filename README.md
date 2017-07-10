@@ -1,27 +1,66 @@
-# GOV.UK Prototype kit · [![Greenkeeper badge](https://badges.greenkeeper.io/alphagov/govuk_prototype_kit.svg)](https://greenkeeper.io/)
+# Character / Word Count
 
-Go to the [GOV.UK Prototype Kit site](https://govuk-prototype-kit.herokuapp.com/docs) to download the latest version and read the documentation.
+## About the component
 
-## About the prototype kit
+A character/word count limit that counts down as users type in to a field. If the user goes over the limit, it counts up.
 
-The prototype kit provides a simple way to make interactive prototypes that look like pages on GOV.UK. These prototypes can be used to show ideas to people you work with, and to do user research.
+## Demo
 
-Read the [project principles](https://govuk-prototype-kit.herokuapp.com/docs/principles).
+- [Character count prototype](https://govuk-charcount-prototype.herokuapp.com/components/char-count)
+- [Word count prototype](https://govuk-charcount-prototype.herokuapp.com/components/word-count)
 
-## Security
 
-If you publish your prototypes online, they **must** be protected by a [username and password](https://govuk-prototype-kit.herokuapp.com/docs/publishing-on-heroku). This is to prevent members of the public finding prototypes and thinking they are real services.
+## Usage
+### Character Count
+#### HTML
+Define the fields with a ``maxlength`` attribute and add a *javascript handler* class (e.g. ``js-char-count``). The field **must** have an ``id`` attribute set to a unique value.
 
-You must protect user privacy at all times, even when using prototypes. Prototypes made with the kit look like GOV.UK, but do not have the same security provisions. Always make sure you are handling user data appropriately.
+```
+<input id="name-field" class="form-control js-char-count" type="text" aria-required="true" maxlength="20">
+```
 
-## Installation instructions
+```
+<textarea id="description-field" class="form-control js-char-count" rows="5" aria-required="true" maxlength="500"></textarea>
+```
 
-- [Installation guide for new users (non technical)](https://govuk-prototype-kit.herokuapp.com/docs/install/introduction)
-- [Installation guide for developers (technical)](https://govuk-prototype-kit.herokuapp.com/docs/install/developer-install-instructions)
+#### JavaScript
+Extend the fields that have a specific class (e.g. ``js-char-count``) to display character count
+```
+var charCount = new GOVUK.CharCount()
+charCount.init({
+  selector: '.js-char-count'
+})
+```
 
-## Community
+### Word Count
+#### HTML
+Since there is no *maxwords* attribute in HTML5, define the fields with a ``data-maxwords`` attribute and add a *javascript handler* class (e.g. ``js-word-count``). The field **must** have an ``id`` attribute set to a unique value.
 
-We have two Slack channels for the Prototype kit. You'll need a government email address to join them.
+```
+<input id="name-field" class="form-control js-word-count" type="text" aria-required="true" data-maxwords="10">
+```
 
-* [Slack channel for users of the prototype kit](https://ukgovernmentdigital.slack.com/messages/prototype-kit/)
-* [Slack channel for developers of the prototype kit](https://ukgovernmentdigital.slack.com/messages/prototype-kit-dev/)
+```
+<textarea id="description-field" class="form-control js-word-count" rows="5" aria-required="true" data-maxwords="30"></textarea>
+```
+
+#### JavaScript
+Extend the fields with a specific class (e.g. ``js-word-count``) to display word count. For initialising the *Word Count* you must add the ``wordCount: true`` to the options of the ``init`` function.
+```
+var charCount = new GOVUK.CharCount()
+charCount.init({
+  selector: '.js-word-count',
+  wordCount: true
+})
+```
+
+## Options
+You can display the count message when the users are at 50% or more setting a percentage value as ``threshold``
+```
+var charCount = new GOVUK.CharCount()
+charCount.init({
+  selector: '.js-word-count',
+  wordCount: true,
+  threshold: 50
+})
+```
