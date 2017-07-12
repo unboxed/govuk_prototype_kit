@@ -55,7 +55,7 @@
           var wrapper = CharCount.prototype.wrapElement(countElement,'form-control-wrapper')
           var elementId = countElement.getAttribute('id')
           var countHighlightClass = (countElement.type=='text')?'backdrop-highlights-input':'backdrop-highlights'
-          wrapper.insertAdjacentHTML('afterbegin','<div id="'+elementId+'-hl" class="form-control '+countHighlightClass+'"></div>')
+          wrapper.insertAdjacentHTML('afterbegin','<div id="'+elementId+'-hl" class="form-control '+countHighlightClass+'" aria-hidden="true" role="presentation"></div>')
 
           var countHighlight = document.getElementById(elementId+'-hl')
           //countHighlight.style.height = CharCount.prototype.getHeight(countElement)+'px'
