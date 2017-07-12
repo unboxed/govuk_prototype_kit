@@ -229,10 +229,24 @@
     return length
   }
 
+  // Escape tags and ampersand
+  String.prototype.escape = function() {
+      var tagsToReplace = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;'
+      };
+      return this.replace(/[&<>]/g, function(tag) {
+          return tagsToReplace[tag] || tag;
+      });
+  };
+
   // Highlight text from a specific limit to end
   CharCount.prototype.highlight = function (text,limit) {
     text = text.replace(/\n$/g, '\n\n')
-    text = [text.slice(0, limit), '<mark>', text.slice(limit)].join('')+'<mark>'
+    var textBeforeLimit = text.slice(0, limit).escape()
+    var textAfterLimit = text.slice(limit).escape()
+    text = [textBeforeLimit, '<mark>', textAfterLimit, '</mark>'].join('')
     return text
   }
 
