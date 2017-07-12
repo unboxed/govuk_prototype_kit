@@ -4,7 +4,7 @@
   var $ = global.jQuery
   var GOVUK = global.GOVUK || {}
 
-  function CharCount(){
+  function CharCount() {
     var self = this
   }
 
@@ -14,7 +14,7 @@
   }
 
   // Wrap element in a div with a specified wrapper class
-  CharCount.prototype.wrapElement = function (element, wrapperClass){
+  CharCount.prototype.wrapElement = function (element, wrapperClass) {
     var wrapper = document.createElement('div')
     wrapper.className = wrapperClass
     element.parentNode.insertBefore(wrapper, element)
@@ -24,13 +24,13 @@
   }
 
   // Get style attribute of an element
-  CharCount.prototype.getStyle = function (element, attributeName){
+  CharCount.prototype.getStyle = function (element, attributeName) {
       var attributeValue = "";
-      if(document.defaultView && document.defaultView.getComputedStyle){
+      if (document.defaultView && document.defaultView.getComputedStyle) {
           attributeValue = document.defaultView.getComputedStyle(element, "").getPropertyValue(attributeName);
       }
-      else if(element.currentStyle){
-          attributeName = attribute.replace(/\-(\w)/g, function (strMatch, p1){
+      else if (element.currentStyle) {
+          attributeName = attribute.replace(/\-(\w)/g, function (strMatch, p1) {
               return p1.toUpperCase();
           });
           attributeValue = element.currentStyle[attributeName];
@@ -46,12 +46,12 @@
 
     // Iterate through each `character count` element
     var countElements = document.getElementsByClassName(options.selector)
-    if (countElements){
-      for (var i = 0, len = countElements.length; i < len; i++){
+    if (countElements) {
+      for (var i = 0, len = countElements.length; i < len; i++) {
         var countElement = countElements[i]
 
         // Highlights
-        if(options && options.highlight){
+        if (options && options.highlight) {
           var wrapper = CharCount.prototype.wrapElement(countElement,'form-control-wrapper')
           var elementId = countElement.getAttribute('id')
           var countHighlightClass = (countElement.type=='text')?'backdrop-highlights-input':'backdrop-highlights'
@@ -66,7 +66,7 @@
           countElement.style.resize = 'none'
 
           //Fix iOS
-          if(CharCount.prototype.isIOS()) {
+          if (CharCount.prototype.isIOS()) {
             CharCount.prototype.fixIOSInput(countHighlight)
           }
         }
@@ -86,7 +86,7 @@
             maxLength: maxLength,
             options: options
           }
-          if(options && options.highlight){
+          if (options && options.highlight) {
             countElementExtended.countHighlight=countHighlight
           }
 
@@ -115,7 +115,7 @@
     // Check for existing info count message
     var countMessage = document.getElementById(elementId+'-info')
     // If there is no existing info count message we add one right after the field
-    if (elementId && !countMessage){
+    if (elementId && !countMessage) {
       countElement.insertAdjacentHTML('afterend','<span id="'+elementId+'-info" class="form-hint js-count-message" aria-live="polite" aria-relevant="additions"></span>')
       countElement.setAttribute('aria-describedby',elementId+'-info')
       countMessage = document.getElementById(elementId+'-info')
@@ -126,7 +126,7 @@
   // Bind input propertychange to the elements and update based on the change
   CharCount.prototype.bindChangeEvents = function (countElementExtended) {
 
-    if(countElementExtended.countElement.addEventListener){
+    if (countElementExtended.countElement.addEventListener) {
       // W3C event model
       countElementExtended.countElement.addEventListener('input', CharCount.prototype.updateCountMessage.bind(countElementExtended))
       //IE 9 does not fire an input event when the user deletes characters from an input (e.g. by pressing Backspace or Delete, or using the "Cut" operation).
@@ -138,7 +138,7 @@
     }
 
     // Bind scroll event if highlight is set
-    if(countElementExtended.options.highlight === true){
+    if (countElementExtended.options.highlight === true) {
       countElementExtended.countElement.addEventListener('scroll', CharCount.prototype.handleScroll.bind(countElementExtended))
       window.addEventListener('resize', CharCount.prototype.handleResize.bind(countElementExtended))
     }
@@ -160,11 +160,11 @@
 
     // Set threshold if presented in options
     var threshold = 0
-    if (options && options.threshold){
+    if (options && options.threshold) {
       threshold = options.threshold
     }
     var thresholdValue = maxLength * threshold / 100
-    if (thresholdValue>currentLength){
+    if (thresholdValue>currentLength) {
       countMessage.classList.add('error-message-hidden')
     }
     else{
@@ -172,7 +172,7 @@
     }
 
     // Update styles
-    if (remainingNumber < 0){
+    if (remainingNumber < 0) {
       countElement.classList.add('form-control-error')
       countMessage.classList.add('error-message')
     }
@@ -184,7 +184,7 @@
     // Update message
     var charVerb = 'remaining'
     var charNoun = 'character'
-    if (options && options.wordCount){
+    if (options && options.wordCount) {
       charNoun = 'word'
     }
     charNoun = charNoun + ((remainingNumber === -1 || remainingNumber === 1)?'':'s')
@@ -192,7 +192,7 @@
     countMessage.innerHTML = remainingNumber+' '+charNoun+' '+charVerb
 
     //Update Highlight
-    if (countHighlight){
+    if (countHighlight) {
       var highlightedText = CharCount.prototype.highlight(countElement.value, maxLength)
       countHighlight.innerHTML = highlightedText
       // var scrollWidth = countElement.offsetWidth-countHighlight.offsetWidth
@@ -217,7 +217,7 @@
   // Counts characters or words in text
   CharCount.prototype.count = function (text,options) {
     var length
-    if (options && options.wordCount){
+    if (options && options.wordCount) {
       //var tokens = text.split(' ')
       //length = tokens.length-1
       var tokens = text.match(/\S+/g) || [] // Matches consecutive non-whitespace chars
@@ -251,8 +251,8 @@
   }
 
   // Browser sniffing is bad, but there are browser-specific quirks to handle that are not a matter of feature detection
-  CharCount.prototype.isIOS = function (){
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream){
+  CharCount.prototype.isIOS = function () {
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
       return true
     }
     else{
@@ -271,7 +271,7 @@
 
   // Initialize component
   CharCount.prototype.init = function (options) {
-    if (options && options.selector){
+    if (options && options.selector) {
       CharCount.prototype.attach(options)
       CharCount.options = options
     }
