@@ -113,7 +113,7 @@
     var countMessage = document.getElementById(elementId + '-info')
     // If there is no existing info count message we add one right after the field
     if (elementId && !countMessage) {
-      countElement.insertAdjacentHTML('afterend', '<span id="' + elementId + '-info" class="form-hint js-count-message" aria-live="polite" aria-relevant="additions"></span>')
+      countElement.insertAdjacentHTML('afterend', '<span id="' + elementId + '-info" class="form-hint js-count-message" aria-live="polite"></span>')
       countElement.setAttribute('aria-describedby', elementId + '-info')
       countMessage = document.getElementById(elementId + '-info')
     }
