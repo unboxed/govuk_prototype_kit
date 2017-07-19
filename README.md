@@ -8,6 +8,8 @@ A character/word count limit that counts down as users type in to a field. If th
 
 - [Character count prototype](https://govuk-charcount-prototype.herokuapp.com/components/char-count)
 - [Word count prototype](https://govuk-charcount-prototype.herokuapp.com/components/word-count)
+- [Char count prototype with threshold](https://govuk-charcount-prototype.herokuapp.com/components/char-count-threshold)
+- [Char count prototype with highlight](https://govuk-charcount-prototype.herokuapp.com/components/char-count-highlight)
 
 
 ## Usage
