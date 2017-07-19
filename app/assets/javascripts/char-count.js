@@ -4,7 +4,7 @@
   var $ = global.jQuery
   var GOVUK = global.GOVUK || {}
 
-  function CharCount() {
+  function CharCount () {
     var self = this
   }
 
@@ -25,22 +25,20 @@
 
   // Get style attribute of an element
   CharCount.prototype.getStyle = function (element, attributeName) {
-      var attributeValue = "";
-      if (document.defaultView && document.defaultView.getComputedStyle) {
-          attributeValue = document.defaultView.getComputedStyle(element, "").getPropertyValue(attributeName);
-      }
-      else if (element.currentStyle) {
-          attributeName = attribute.replace(/\-(\w)/g, function (strMatch, p1) {
-              return p1.toUpperCase();
-          });
-          attributeValue = element.currentStyle[attributeName];
-      }
-      return attributeValue;
+    var attributeValue = ''
+    if (document.defaultView && document.defaultView.getComputedStyle) {
+      attributeValue = document.defaultView.getComputedStyle(element, '').getPropertyValue(attributeName)
+    } else if (element.currentStyle) {
+      attributeName = attributeName.replace(/-(\w)/g, function (strMatch, p1) {
+        return p1.toUpperCase()
+      })
+      attributeValue = element.currentStyle[attributeName]
+    }
+    return attributeValue
   }
 
   // Attach count to the field
   CharCount.prototype.attach = function (options) {
-
     // Determine the limit attribute
     var countAttribute = (options && options.wordCount) ? this.defaults.wordCountAttribute : this.defaults.charCountAttribute
 
@@ -52,20 +50,20 @@
 
         // Highlights
         if (options && options.highlight) {
-          var wrapper = CharCount.prototype.wrapElement(countElement,'form-control-wrapper')
+          var wrapper = CharCount.prototype.wrapElement(countElement, 'form-control-wrapper')
           var elementId = countElement.getAttribute('id')
-          var countHighlightClass = (countElement.type=='text')?'backdrop-highlights-input':'backdrop-highlights'
-          wrapper.insertAdjacentHTML('afterbegin','<div id="'+elementId+'-hl" class="form-control '+countHighlightClass+'" aria-hidden="true" role="presentation"></div>')
+          var countHighlightClass = (countElement.type === 'text') ? 'backdrop-highlights-input' : 'backdrop-highlights'
+          wrapper.insertAdjacentHTML('afterbegin', '<div id="' + elementId + '-hl" class="form-control ' + countHighlightClass + '" aria-hidden="true" role="presentation"></div>')
 
-          var countHighlight = document.getElementById(elementId+'-hl')
-          //countHighlight.style.height = CharCount.prototype.getHeight(countElement)+'px'
-          //countHighlight.style.height = countElement.getBoundingClientRect().height+'px'
-          countHighlight.style.height = countElement.offsetHeight+'px'
+          var countHighlight = document.getElementById(elementId + '-hl')
+          // countHighlight.style.height = CharCount.prototype.getHeight(countElement) + 'px'
+          // countHighlight.style.height = countElement.getBoundingClientRect().height + 'px'
+          countHighlight.style.height = countElement.offsetHeight + 'px'
 
           // We have to disable resize on highlighted components to avoid the async scroll and boundaries
           countElement.style.resize = 'none'
 
-          //Fix iOS
+          // Fix iOS
           if (CharCount.prototype.isIOS()) {
             CharCount.prototype.fixIOSInput(countHighlight)
           }
@@ -87,22 +85,21 @@
             options: options
           }
           if (options && options.highlight) {
-            countElementExtended.countHighlight=countHighlight
+            countElementExtended.countHighlight = countHighlight
           }
 
           // Bind input
           CharCount.prototype.bindChangeEvents(countElementExtended)
 
           // Trigger the proper event in order to display initial message
-          //$(countElement).trigger('input')
-          //CharCount.prototype.updateMessage.call(countElement)
+          // $(countElement).trigger('input')
+          // CharCount.prototype.updateMessage.call(countElement)
           var inputEvent = new Event('input')
           countElement.dispatchEvent(inputEvent)
-          countElement.setAttribute('maxlength','')
-        }
-        else{
+          countElement.setAttribute('maxlength', '')
+        } else {
           if (!countMessage) window.console.warn('Make sure you set an id for each of your field(s)')
-          if (!maxLength) window.console.warn('Make sure you set the '+countAttribute+' for each of your field(s)')
+          if (!maxLength) window.console.warn('Make sure you set the ' + countAttribute + ' for each of your field(s)')
         }
       }
     }
@@ -113,26 +110,24 @@
   CharCount.prototype.getCountMessage = function (countElement) {
     var elementId = countElement.getAttribute('id')
     // Check for existing info count message
-    var countMessage = document.getElementById(elementId+'-info')
+    var countMessage = document.getElementById(elementId + '-info')
     // If there is no existing info count message we add one right after the field
     if (elementId && !countMessage) {
-      countElement.insertAdjacentHTML('afterend','<span id="'+elementId+'-info" class="form-hint js-count-message" aria-live="polite" aria-relevant="additions"></span>')
-      countElement.setAttribute('aria-describedby',elementId+'-info')
-      countMessage = document.getElementById(elementId+'-info')
+      countElement.insertAdjacentHTML('afterend', '<span id="' + elementId + '-info" class="form-hint js-count-message" aria-live="polite" aria-relevant="additions"></span>')
+      countElement.setAttribute('aria-describedby', elementId + '-info')
+      countMessage = document.getElementById(elementId + '-info')
     }
     return countMessage
   }
 
   // Bind input propertychange to the elements and update based on the change
   CharCount.prototype.bindChangeEvents = function (countElementExtended) {
-
     if (countElementExtended.countElement.addEventListener) {
       // W3C event model
       countElementExtended.countElement.addEventListener('input', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-      //IE 9 does not fire an input event when the user deletes characters from an input (e.g. by pressing Backspace or Delete, or using the "Cut" operation).
+      // IE 9 does not fire an input event when the user deletes characters from an input (e.g. by pressing Backspace or Delete, or using the "Cut" operation).
       countElementExtended.countElement.addEventListener('keyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-    }
-    else{
+    } else {
       // Microsoft event model: onpropertychange/onkeyup
       countElementExtended.countElement.attachEvent('onkeyup', CharCount.prototype.redraw.bind(countElementExtended))
     }
@@ -142,7 +137,6 @@
       countElementExtended.countElement.addEventListener('scroll', CharCount.prototype.handleScroll.bind(countElementExtended))
       window.addEventListener('resize', CharCount.prototype.handleResize.bind(countElementExtended))
     }
-
   }
 
   // Update message box
@@ -151,10 +145,10 @@
     var options = this.options
     var countMessage = this.countMessage
     var countHighlight = this.countHighlight
-    //var countMessage = document.getElementById(countElement.getAttribute('aria-describedby'))
+    // var countMessage = document.getElementById(countElement.getAttribute('aria-describedby'))
 
     // Determine the remainingNumber
-    var currentLength = CharCount.prototype.count(countElement.value,options)
+    var currentLength = CharCount.prototype.count(countElement.value, options)
     var maxLength = this.maxLength
     var remainingNumber = maxLength - currentLength
 
@@ -164,10 +158,9 @@
       threshold = options.threshold
     }
     var thresholdValue = maxLength * threshold / 100
-    if (thresholdValue>currentLength) {
+    if (thresholdValue > currentLength) {
       countMessage.classList.add('error-message-hidden')
-    }
-    else{
+    } else {
       countMessage.classList.remove('error-message-hidden')
     }
 
@@ -175,8 +168,7 @@
     if (remainingNumber < 0) {
       countElement.classList.add('form-control-error')
       countMessage.classList.add('error-message')
-    }
-    else{
+    } else {
       countElement.classList.remove('form-control-error')
       countMessage.classList.remove('error-message')
     }
@@ -187,11 +179,11 @@
     if (options && options.wordCount) {
       charNoun = 'word'
     }
-    charNoun = charNoun + ((remainingNumber === -1 || remainingNumber === 1)?'':'s')
-    //charVerb = (remaining < 0)?'too many':'remaining'
-    countMessage.innerHTML = remainingNumber+' '+charNoun+' '+charVerb
+    charNoun = charNoun + ((remainingNumber === -1 || remainingNumber === 1) ? '' : 's')
+    // charVerb = (remaining < 0)?'too many':'remaining'
+    countMessage.innerHTML = remainingNumber + ' ' + charNoun + ' ' + charVerb
 
-    //Update Highlight
+    // Update Highlight
     if (countHighlight) {
       var highlightedText = CharCount.prototype.highlight(countElement.value, maxLength)
       countHighlight.innerHTML = highlightedText
@@ -211,38 +203,37 @@
 
   // Update element's height after window resize
   CharCount.prototype.handleResize = function () {
-    this.countHighlight.style.height = this.countElement.getBoundingClientRect().height+'px'
+    this.countHighlight.style.height = this.countElement.getBoundingClientRect().height + 'px'
   }
 
   // Counts characters or words in text
-  CharCount.prototype.count = function (text,options) {
+  CharCount.prototype.count = function (text, options) {
     var length
     if (options && options.wordCount) {
-      //var tokens = text.split(' ')
-      //length = tokens.length-1
+      // var tokens = text.split(' ')
+      // length = tokens.length-1
       var tokens = text.match(/\S+/g) || [] // Matches consecutive non-whitespace chars
       length = tokens.length
-    }
-    else {
+    } else {
       length = text.length
     }
     return length
   }
 
   // Escape tags and ampersand
-  String.prototype.escape = function() {
-      var tagsToReplace = {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;'
-      };
-      return this.replace(/[&<>]/g, function(tag) {
-          return tagsToReplace[tag] || tag;
-      });
-  };
+  String.prototype.escape = function () {
+    var tagsToReplace = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;'
+    }
+    return this.replace(/[&<>]/g, function (tag) {
+      return tagsToReplace[tag] || tag
+    })
+  }
 
   // Highlight text from a specific limit to end
-  CharCount.prototype.highlight = function (text,limit) {
+  CharCount.prototype.highlight = function (text, limit) {
     text = text.replace(/\n$/g, '\n\n')
     var textBeforeLimit = text.slice(0, limit).escape()
     var textAfterLimit = text.slice(limit).escape()
@@ -254,19 +245,18 @@
   CharCount.prototype.isIOS = function () {
     if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
       return true
-    }
-    else{
+    } else {
       return false
     }
   }
 
   // Fix iOS default padding
   // iOS adds 3px of (unremovable) padding to the left and right of a textarea, so adjust highlights div to match
-  CharCount.prototype.fixIOSInput = function(element) {
-    var paddingLeft = parseInt(CharCount.prototype.getStyle(element,'padding-left'))
-    var paddingRight = parseInt(CharCount.prototype.getStyle(element,'padding-right'))
-    element.style.paddingLeft = paddingLeft+3+'px'
-    element.style.paddingRight = paddingRight+3+'px'
+  CharCount.prototype.fixIOSInput = function (element) {
+    var paddingLeft = parseInt(CharCount.prototype.getStyle(element, 'padding-left'))
+    var paddingRight = parseInt(CharCount.prototype.getStyle(element, 'padding-right'))
+    element.style.paddingLeft = paddingLeft + 3 + 'px'
+    element.style.paddingRight = paddingRight + 3 + 'px'
   }
 
   // Initialize component
@@ -274,8 +264,7 @@
     if (options && options.selector) {
       CharCount.prototype.attach(options)
       CharCount.options = options
-    }
-    else {
+    } else {
       window.console.warn('Please specify the selector for the char/word count field')
     }
   }
