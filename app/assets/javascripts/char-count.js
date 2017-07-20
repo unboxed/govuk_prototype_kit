@@ -14,6 +14,18 @@
     wordCountAttribute: 'data-maxwords'
   }
 
+  // Escape tags and ampersand
+  String.prototype.escape = function () {
+    var tagsToReplace = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;'
+    }
+    return this.replace(/[&<>]/g, function (tag) {
+      return tagsToReplace[tag] || tag
+    })
+  }
+
   // Wrap element in a div with a specified wrapper class
   CharCount.prototype.wrapElement = function (element, wrapperClass) {
     var wrapper = document.createElement('div')
@@ -36,18 +48,6 @@
       attributeValue = element.currentStyle[attributeName]
     }
     return attributeValue
-  }
-
-  // Escape tags and ampersand
-  String.prototype.escape = function () {
-    var tagsToReplace = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;'
-    }
-    return this.replace(/[&<>]/g, function (tag) {
-      return tagsToReplace[tag] || tag
-    })
   }
 
   // Browser sniffing is bad, but there are browser-specific quirks to handle that are not a matter of feature detection
@@ -135,6 +135,7 @@
       }
     }
   }
+
   // Counts characters or words in text
   CharCount.prototype.count = function (text, options) {
     var length
@@ -171,6 +172,30 @@
       countMessage = document.getElementById(elementId + '-info')
     }
     return countMessage
+  }
+
+  // Bind input propertychange to the elements and update based on the change
+  CharCount.prototype.bindChangeEvents = function (countElementExtended) {
+    if (countElementExtended.countElement.addEventListener) {
+      // W3C event model
+      countElementExtended.countElement.addEventListener('input', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+      // countElementExtended.countElement.addEventListener('onpropertychange', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+      // IE 9 does not fire an input event when the user deletes characters from an input (e.g. by pressing Backspace or Delete, or using the "Cut" operation).
+      // countElementExtended.countElement.addEventListener('keyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+    } else {
+      // Microsoft event model: onpropertychange/onkeyup
+      countElementExtended.countElement.attachEvent('onkeyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+    }
+
+    // Bind scroll event if highlight is set
+    if (countElementExtended.options.highlight === true) {
+      countElementExtended.countElement.addEventListener('scroll', CharCount.prototype.handleScroll.bind(countElementExtended))
+      window.addEventListener('resize', CharCount.prototype.handleResize.bind(countElementExtended))
+    }
+
+    // Bind focus/blur events for polling
+    countElementExtended.countElement.addEventListener('focus', CharCount.prototype.handleFocus.bind(countElementExtended))
+    countElementExtended.countElement.addEventListener('blur', CharCount.prototype.handleBlur.bind(countElementExtended))
   }
 
   // Applications like Dragon NaturallySpeaking will modify the fields by directly changing its `value`.
@@ -238,30 +263,6 @@
       // countHighlight.style.width=countHighlight.offsetWidth+scrollWidth+'px'
       // console.log(countHighlight.style.width)
     }
-  }
-
-  // Bind input propertychange to the elements and update based on the change
-  CharCount.prototype.bindChangeEvents = function (countElementExtended) {
-    if (countElementExtended.countElement.addEventListener) {
-      // W3C event model
-      countElementExtended.countElement.addEventListener('input', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-      // countElementExtended.countElement.addEventListener('onpropertychange', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-      // IE 9 does not fire an input event when the user deletes characters from an input (e.g. by pressing Backspace or Delete, or using the "Cut" operation).
-      // countElementExtended.countElement.addEventListener('keyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-    } else {
-      // Microsoft event model: onpropertychange/onkeyup
-      countElementExtended.countElement.attachEvent('onkeyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-    }
-
-    // Bind scroll event if highlight is set
-    if (countElementExtended.options.highlight === true) {
-      countElementExtended.countElement.addEventListener('scroll', CharCount.prototype.handleScroll.bind(countElementExtended))
-      window.addEventListener('resize', CharCount.prototype.handleResize.bind(countElementExtended))
-    }
-
-    // Bind focus/blur events for polling
-    countElementExtended.countElement.addEventListener('focus', CharCount.prototype.handleFocus.bind(countElementExtended))
-    countElementExtended.countElement.addEventListener('blur', CharCount.prototype.handleBlur.bind(countElementExtended))
   }
 
   // Check if value changed on focus
