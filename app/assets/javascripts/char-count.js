@@ -38,6 +38,36 @@
     return attributeValue
   }
 
+  // Escape tags and ampersand
+  String.prototype.escape = function () {
+    var tagsToReplace = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;'
+    }
+    return this.replace(/[&<>]/g, function (tag) {
+      return tagsToReplace[tag] || tag
+    })
+  }
+
+  // Browser sniffing is bad, but there are browser-specific quirks to handle that are not a matter of feature detection
+  CharCount.prototype.isIOS = function () {
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  // Fix iOS default padding
+  // iOS adds 3px of (unremovable) padding to the left and right of a textarea, so adjust highlights div to match
+  CharCount.prototype.fixIOSInput = function (element) {
+    var paddingLeft = parseInt(CharCount.prototype.getStyle(element, 'padding-left'))
+    var paddingRight = parseInt(CharCount.prototype.getStyle(element, 'padding-right'))
+    element.style.paddingLeft = paddingLeft + 3 + 'px'
+    element.style.paddingRight = paddingRight + 3 + 'px'
+  }
+
   // Attach count to the field
   CharCount.prototype.attach = function (options) {
     // Determine the limit attribute
@@ -105,6 +135,28 @@
       }
     }
   }
+  // Counts characters or words in text
+  CharCount.prototype.count = function (text, options) {
+    var length
+    if (options && options.wordCount) {
+      // var tokens = text.split(' ')
+      // length = tokens.length-1
+      var tokens = text.match(/\S+/g) || [] // Matches consecutive non-whitespace chars
+      length = tokens.length
+    } else {
+      length = text.length
+    }
+    return length
+  }
+
+  // Highlight text from a specific limit to end
+  CharCount.prototype.highlight = function (text, limit) {
+    text = text.replace(/\n$/g, '\n\n')
+    var textBeforeLimit = text.slice(0, limit).escape()
+    var textAfterLimit = text.slice(limit).escape()
+    text = [textBeforeLimit, '<mark>', textAfterLimit, '</mark>'].join('')
+    return text
+  }
 
   // Generate count message and bind it to the input
   // returns reference to the generated element
@@ -119,39 +171,6 @@
       countMessage = document.getElementById(elementId + '-info')
     }
     return countMessage
-  }
-
-  // Bind input propertychange to the elements and update based on the change
-  CharCount.prototype.bindChangeEvents = function (countElementExtended) {
-    if (countElementExtended.countElement.addEventListener) {
-      // W3C event model
-      countElementExtended.countElement.addEventListener('input', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-      // countElementExtended.countElement.addEventListener('onpropertychange', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-      // IE 9 does not fire an input event when the user deletes characters from an input (e.g. by pressing Backspace or Delete, or using the "Cut" operation).
-      // countElementExtended.countElement.addEventListener('keyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-    } else {
-      // Microsoft event model: onpropertychange/onkeyup
-      countElementExtended.countElement.attachEvent('onkeyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
-    }
-
-    // Bind scroll event if highlight is set
-    if (countElementExtended.options.highlight === true) {
-      countElementExtended.countElement.addEventListener('scroll', CharCount.prototype.handleScroll.bind(countElementExtended))
-      window.addEventListener('resize', CharCount.prototype.handleResize.bind(countElementExtended))
-    }
-
-    // Bind focus/blur events for polling
-    countElementExtended.countElement.addEventListener('focus', CharCount.prototype.handleFocus.bind(countElementExtended))
-    countElementExtended.countElement.addEventListener('blur', CharCount.prototype.handleBlur.bind(countElementExtended))
-  }
-
-  CharCount.prototype.handleFocus = function (event) {
-    var countElement = this.countElement
-    this.valueChecker = setInterval(CharCount.prototype.checkIfValueChanged, 500, countElement)
-  }
-
-  CharCount.prototype.handleBlur = function (event) {
-    clearInterval(this.valueChecker)
   }
 
   // Applications like Dragon NaturallySpeaking will modify the fields by directly changing its `value`.
@@ -221,6 +240,41 @@
     }
   }
 
+  // Bind input propertychange to the elements and update based on the change
+  CharCount.prototype.bindChangeEvents = function (countElementExtended) {
+    if (countElementExtended.countElement.addEventListener) {
+      // W3C event model
+      countElementExtended.countElement.addEventListener('input', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+      // countElementExtended.countElement.addEventListener('onpropertychange', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+      // IE 9 does not fire an input event when the user deletes characters from an input (e.g. by pressing Backspace or Delete, or using the "Cut" operation).
+      // countElementExtended.countElement.addEventListener('keyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+    } else {
+      // Microsoft event model: onpropertychange/onkeyup
+      countElementExtended.countElement.attachEvent('onkeyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+    }
+
+    // Bind scroll event if highlight is set
+    if (countElementExtended.options.highlight === true) {
+      countElementExtended.countElement.addEventListener('scroll', CharCount.prototype.handleScroll.bind(countElementExtended))
+      window.addEventListener('resize', CharCount.prototype.handleResize.bind(countElementExtended))
+    }
+
+    // Bind focus/blur events for polling
+    countElementExtended.countElement.addEventListener('focus', CharCount.prototype.handleFocus.bind(countElementExtended))
+    countElementExtended.countElement.addEventListener('blur', CharCount.prototype.handleBlur.bind(countElementExtended))
+  }
+
+  // Check if value changed on focus
+  CharCount.prototype.handleFocus = function (event) {
+    var countElement = this.countElement
+    this.valueChecker = setInterval(CharCount.prototype.checkIfValueChanged, 500, countElement)
+  }
+
+  // Cancel valaue checking on blur
+  CharCount.prototype.handleBlur = function (event) {
+    clearInterval(this.valueChecker)
+  }
+
   // Sync field scroll with the backdrop highlight scroll
   CharCount.prototype.handleScroll = function (event) {
     this.countHighlight.scrollTop = this.countElement.scrollTop
@@ -230,59 +284,6 @@
   // Update element's height after window resize
   CharCount.prototype.handleResize = function (event) {
     this.countHighlight.style.height = this.countElement.getBoundingClientRect().height + 'px'
-  }
-
-  // Counts characters or words in text
-  CharCount.prototype.count = function (text, options) {
-    var length
-    if (options && options.wordCount) {
-      // var tokens = text.split(' ')
-      // length = tokens.length-1
-      var tokens = text.match(/\S+/g) || [] // Matches consecutive non-whitespace chars
-      length = tokens.length
-    } else {
-      length = text.length
-    }
-    return length
-  }
-
-  // Escape tags and ampersand
-  String.prototype.escape = function () {
-    var tagsToReplace = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;'
-    }
-    return this.replace(/[&<>]/g, function (tag) {
-      return tagsToReplace[tag] || tag
-    })
-  }
-
-  // Highlight text from a specific limit to end
-  CharCount.prototype.highlight = function (text, limit) {
-    text = text.replace(/\n$/g, '\n\n')
-    var textBeforeLimit = text.slice(0, limit).escape()
-    var textAfterLimit = text.slice(limit).escape()
-    text = [textBeforeLimit, '<mark>', textAfterLimit, '</mark>'].join('')
-    return text
-  }
-
-  // Browser sniffing is bad, but there are browser-specific quirks to handle that are not a matter of feature detection
-  CharCount.prototype.isIOS = function () {
-    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  // Fix iOS default padding
-  // iOS adds 3px of (unremovable) padding to the left and right of a textarea, so adjust highlights div to match
-  CharCount.prototype.fixIOSInput = function (element) {
-    var paddingLeft = parseInt(CharCount.prototype.getStyle(element, 'padding-left'))
-    var paddingRight = parseInt(CharCount.prototype.getStyle(element, 'padding-right'))
-    element.style.paddingLeft = paddingLeft + 3 + 'px'
-    element.style.paddingRight = paddingRight + 3 + 'px'
   }
 
   // Initialize component
