@@ -6,6 +6,7 @@
 
   function CharCount () {
     var self = this
+    var valueChecker
   }
 
   CharCount.prototype.defaults = {
@@ -73,7 +74,7 @@
         var maxLength = countElement.getAttribute(countAttribute)
 
         // Generate and reference message
-        var countMessage = CharCount.prototype.getCountMessage(countElement)
+        var countMessage = CharCount.prototype.createCountMessage(countElement)
 
         // Bind the on change events
         if (maxLength && countMessage) {
@@ -107,7 +108,7 @@
 
   // Generate count message and bind it to the input
   // returns reference to the generated element
-  CharCount.prototype.getCountMessage = function (countElement) {
+  CharCount.prototype.createCountMessage = function (countElement) {
     var elementId = countElement.getAttribute('id')
     // Check for existing info count message
     var countMessage = document.getElementById(elementId + '-info')
@@ -125,17 +126,42 @@
     if (countElementExtended.countElement.addEventListener) {
       // W3C event model
       countElementExtended.countElement.addEventListener('input', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+      // countElementExtended.countElement.addEventListener('onpropertychange', CharCount.prototype.updateCountMessage.bind(countElementExtended))
       // IE 9 does not fire an input event when the user deletes characters from an input (e.g. by pressing Backspace or Delete, or using the "Cut" operation).
       // countElementExtended.countElement.addEventListener('keyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
     } else {
       // Microsoft event model: onpropertychange/onkeyup
-      countElementExtended.countElement.attachEvent('onkeyup', CharCount.prototype.redraw.bind(countElementExtended))
+      countElementExtended.countElement.attachEvent('onkeyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
     }
 
     // Bind scroll event if highlight is set
     if (countElementExtended.options.highlight === true) {
       countElementExtended.countElement.addEventListener('scroll', CharCount.prototype.handleScroll.bind(countElementExtended))
       window.addEventListener('resize', CharCount.prototype.handleResize.bind(countElementExtended))
+    }
+
+    // Bind focus/blur events for polling
+    countElementExtended.countElement.addEventListener('focus', CharCount.prototype.handleFocus.bind(countElementExtended))
+    countElementExtended.countElement.addEventListener('blur', CharCount.prototype.handleBlur.bind(countElementExtended))
+  }
+
+  CharCount.prototype.handleFocus = function (event) {
+    var countElement = this.countElement
+    this.valueChecker = setInterval(CharCount.prototype.checkIfValueChanged, 500, countElement)
+  }
+
+  CharCount.prototype.handleBlur = function (event) {
+    clearInterval(this.valueChecker)
+  }
+
+  // Applications like Dragon NaturallySpeaking will modify the fields by directly changing its `value`.
+  // These events don't trigger in JavaScript, so we need to poll to handle when and if they occur.
+  CharCount.prototype.checkIfValueChanged = function (element) {
+    if (!element.oldValue) element.oldValue = ''
+    if (element.value !== element.oldValue) {
+      var inputEvent = new Event('input')
+      element.dispatchEvent(inputEvent)
+      element.oldValue = element.value
     }
   }
 
@@ -196,13 +222,13 @@
   }
 
   // Sync field scroll with the backdrop highlight scroll
-  CharCount.prototype.handleScroll = function () {
+  CharCount.prototype.handleScroll = function (event) {
     this.countHighlight.scrollTop = this.countElement.scrollTop
     this.countHighlight.scrollLeft = this.countElement.scrollLeft
   }
 
   // Update element's height after window resize
-  CharCount.prototype.handleResize = function () {
+  CharCount.prototype.handleResize = function (event) {
     this.countHighlight.style.height = this.countElement.getBoundingClientRect().height + 'px'
   }
 
