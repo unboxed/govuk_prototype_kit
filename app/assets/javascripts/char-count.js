@@ -4,10 +4,7 @@
   var $ = global.jQuery
   var GOVUK = global.GOVUK || {}
 
-  function CharCount () {
-    var self = this
-    var valueChecker
-  }
+  function CharCount () { }
 
   CharCount.prototype.defaults = {
     charCountAttribute: 'maxlength',
@@ -125,8 +122,7 @@
           // Trigger the proper event in order to display initial message
           // $(countElement).trigger('input')
           // CharCount.prototype.updateMessage.call(countElement)
-          var inputEvent = new Event('input')
-          countElement.dispatchEvent(inputEvent)
+          CharCount.prototype.updateCountMessage(countElementExtended)
           countElement.setAttribute('maxlength', '')
         } else {
           if (!countMessage) window.console.warn('Make sure you set an id for each of your field(s)')
@@ -178,13 +174,13 @@
   CharCount.prototype.bindChangeEvents = function (countElementExtended) {
     if (countElementExtended.countElement.addEventListener) {
       // W3C event model
-      countElementExtended.countElement.addEventListener('input', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+      countElementExtended.countElement.addEventListener('input', CharCount.prototype.handleInput.bind(countElementExtended))
       // countElementExtended.countElement.addEventListener('onpropertychange', CharCount.prototype.updateCountMessage.bind(countElementExtended))
       // IE 9 does not fire an input event when the user deletes characters from an input (e.g. by pressing Backspace or Delete, or using the "Cut" operation).
       // countElementExtended.countElement.addEventListener('keyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
     } else {
       // Microsoft event model: onpropertychange/onkeyup
-      countElementExtended.countElement.attachEvent('onkeyup', CharCount.prototype.updateCountMessage.bind(countElementExtended))
+      countElementExtended.countElement.attachEvent('onkeyup', CharCount.prototype.handleInput.bind(countElementExtended))
     }
 
     // Bind scroll event if highlight is set
@@ -200,26 +196,25 @@
 
   // Applications like Dragon NaturallySpeaking will modify the fields by directly changing its `value`.
   // These events don't trigger in JavaScript, so we need to poll to handle when and if they occur.
-  CharCount.prototype.checkIfValueChanged = function (element) {
-    if (!element.oldValue) element.oldValue = ''
-    if (element.value !== element.oldValue) {
-      var inputEvent = new Event('input')
-      element.dispatchEvent(inputEvent)
-      element.oldValue = element.value
+  CharCount.prototype.checkIfValueChanged = function (countElementExtended) {
+    if (!countElementExtended.countElement.oldValue) countElementExtended.countElement.oldValue = ''
+    if (countElementExtended.countElement.value !== countElementExtended.countElement.oldValue) {
+      countElementExtended.countElement.oldValue = countElementExtended.countElement.value
+      CharCount.prototype.updateCountMessage(countElementExtended)
     }
   }
 
   // Update message box
-  CharCount.prototype.updateCountMessage = function (event) {
-    var countElement = this.countElement
-    var options = this.options
-    var countMessage = this.countMessage
-    var countHighlight = this.countHighlight
+  CharCount.prototype.updateCountMessage = function (countElementExtended) {
+    var countElement = countElementExtended.countElement
+    var options = countElementExtended.options
+    var countMessage = countElementExtended.countMessage
+    var countHighlight = countElementExtended.countHighlight
     // var countMessage = document.getElementById(countElement.getAttribute('aria-describedby'))
 
     // Determine the remainingNumber
     var currentLength = CharCount.prototype.count(countElement.value, options)
-    var maxLength = this.maxLength
+    var maxLength = countElementExtended.maxLength
     var remainingNumber = maxLength - currentLength
 
     // Set threshold if presented in options
@@ -257,18 +252,17 @@
     if (countHighlight) {
       var highlightedText = CharCount.prototype.highlight(countElement.value, maxLength)
       countHighlight.innerHTML = highlightedText
-      // var scrollWidth = countElement.offsetWidth-countHighlight.offsetWidth
-      // console.log("scrollWidth: "+countHighlight.offsetWidth)
-      // countHighlight.style.width = countHighlight.offsetWidth+scrollWidth+'px'
-      // countHighlight.style.width=countHighlight.offsetWidth+scrollWidth+'px'
-      // console.log(countHighlight.style.width)
     }
+  }
+
+  // Check if value changed after input triggered
+  CharCount.prototype.handleInput = function (event) {
+    CharCount.prototype.checkIfValueChanged(this)
   }
 
   // Check if value changed on focus
   CharCount.prototype.handleFocus = function (event) {
-    var countElement = this.countElement
-    this.valueChecker = setInterval(CharCount.prototype.checkIfValueChanged, 500, countElement)
+    this.valueChecker = setInterval(CharCount.prototype.checkIfValueChanged, 100, this)
   }
 
   // Cancel valaue checking on blur
