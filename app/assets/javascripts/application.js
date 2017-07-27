@@ -17,69 +17,77 @@ $(document).ready(function () {
   var showHideContent = new GOVUK.ShowHideContent()
   showHideContent.init()
 
-  var loader = new GOVUK.Loader()
-  loader.init({
-    container: 'govuk-box'
-  })
+  if (document.getElementById('govuk-box')) {
+    var loader = new GOVUK.Loader()
+    loader.init({
+      container: 'govuk-box'
+    })
+  }
 
-  var loader2 = new GOVUK.Loader()
-  loader2.init({
-    container: 'govuk-box-message',
-    label: true
-  })
+  if (document.getElementById('govuk-box-message')) {
+    var loader2 = new GOVUK.Loader()
+    loader2.init({
+      container: 'govuk-box-message',
+      label: true
+    })
+  }
 
-  var loader3 = new GOVUK.Loader()
-  loader3.init({
-    container: 'govuk-box-update-message',
-    label: true,
-    labelText: 'Loading...'
-  })
-  // if (loader3.label) {
-  //   setTimeout(updateLabelUpload, 5000)
-  //   setTimeout(updateLabelCrop, 7000)
-  //   setTimeout(loadContent.bind(loader3), 10000)
-  // }
+  if (document.getElementById('govuk-box-update-message')) {
+    var loader3 = new GOVUK.Loader()
+    loader3.init({
+      container: 'govuk-box-update-message',
+      label: true,
+      labelText: 'Loading...'
+    })
+    setTimeout(function () { updateLabelUpload(loader3) }, 5000)
+    setTimeout(function () { updateLabelCrop(loader3) }, 7000)
+    setTimeout(function () { loadContent(loader3) }, 10000)
+  }
 
-  var loader4 = new GOVUK.Loader()
-  loader4.init({
-    container: 'govuk-box-update-progress',
-    label: true,
-    progress: true
-  })
-  var progress = 0
   if (document.getElementById('govuk-box-update-progress')) {
-    for (var x = 0; x <= 10; x++) setTimeout(updateProgress, 1000 * x)
-    setTimeout(loadContent, 11000)
+    var loader4 = new GOVUK.Loader()
+    loader4.init({
+      container: 'govuk-box-update-progress',
+      label: true,
+      progress: true
+    })
+    var progress = 0
+    for (var x = 0; x <= 10; x++) setTimeout(function () { updateProgress(loader4) }, 1000 * x)
+    setTimeout(function () { loadContent(loader4) }, 11000)
   }
 
-  var loader5 = new GOVUK.Loader()
-  loader5.init({
-    container: 'govuk-box-highlight',
-    color: '#fff'
-  })
-
-  var loader6 = new GOVUK.Loader()
-  loader6.init({
-    container: 'govuk-box-inverted',
-    color: '#fff'
-  })
-
-  function updateLabelUpload () {
-    loader3.updateMessage('Uploading...')
+  if (document.getElementById('govuk-box-highlight')) {
+    var loader5 = new GOVUK.Loader()
+    loader5.init({
+      container: 'govuk-box-highlight',
+      color: '#fff'
+    })
   }
 
-  function updateLabelCrop () {
-    loader3.updateMessage('Cropping...')
+  if (document.getElementById('govuk-box-inverted')) {
+    var loader6 = new GOVUK.Loader()
+    loader6.init({
+      container: 'govuk-box-inverted',
+      color: '#fff'
+    })
   }
 
-  function updateProgress () {
-    loader4.updateMessage('Loading... ' + 10 * progress + '%')
-    loader4.updateProgress(10 * progress++)
+  function updateLabelUpload (l) {
+    l.updateMessage('Uploading...')
   }
 
-  function loadContent () {
-    loader4.stop()
-    loader4.updateContainer('Done.')
+  function updateLabelCrop (l) {
+    l.updateMessage('Cropping...')
+  }
+
+  function updateProgress (l) {
+    l.updateMessage('Loading... ' + 10 * progress + '%')
+    l.updateProgress(10 * progress++)
+  }
+
+  function loadContent (l) {
+    l.stop()
+    l.updateContainer('Done.')
   }
 
   // meta=document.createElement('meta')

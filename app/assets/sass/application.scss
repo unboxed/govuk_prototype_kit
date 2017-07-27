@@ -29,22 +29,20 @@ $path: "/public/images/";
 }
 
 // Add extra styles here, or re-organise the Sass files in whichever way makes most sense to you
-.loader{
+.govuk-c-loader{
   padding: $gutter 0;
   text-align: center;
-  svg{
-    z-index: 2000000000;
-    // position: absolute;
-    // left: 50%;
-    // top: 50%;
-    overflow: visible;
-    max-height: 100%;
-  }
-  label{
-    display: block;
-    margin-bottom: 1em;
-    margin-top: -1em;
-  }
+  position: relative;
+}
+.govuk-c-loader__spinner{
+  z-index: 2000000000;
+  // overflow: visible;
+  // max-height: 100%;
+}
+.govuk-c-loader__label{
+  display: block;
+  margin-bottom: 1em;
+  margin-top: -1em;
 }
 
 .govuk-box {
