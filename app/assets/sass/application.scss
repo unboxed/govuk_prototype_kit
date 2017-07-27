@@ -30,18 +30,21 @@ $path: "/public/images/";
 
 // Add extra styles here, or re-organise the Sass files in whichever way makes most sense to you
 .govuk-c-loader{
-  padding: $gutter 0;
+  // padding: $gutter 0;
   text-align: center;
   position: relative;
+  &:focus{
+    outline: 3px solid $focus-colour;
+  }
 }
+
 .govuk-c-loader__spinner{
   z-index: 2000000000;
-  // overflow: visible;
-  // max-height: 100%;
 }
+
 .govuk-c-loader__label{
   display: block;
-  margin-bottom: 1em;
+  padding-bottom: 1em;
   margin-top: -1em;
 }
 

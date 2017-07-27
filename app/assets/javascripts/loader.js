@@ -18,7 +18,7 @@
     length: 7,             // The length of each line
     width: 5,              // The line thickness
     radius: 10,            // The radius of the inner circle
-    corners: .5,          // Roundness (0..1)
+    corners: 0.5,          // Roundness (0..1)
     color: '#000',         // #rgb or #rrggbb
     opacity: 0.25,         // Opacity of the lines
     rotate: 0,             // Rotation offset
@@ -166,10 +166,9 @@
       } else {
         // VML version
         spinner = Loader.prototype.createHtmlElement('div', {
-          'class': 'govuk-c-loader__spinner govuk-c-loader__spinner__ie',
-          'width': options.size,
-          'height': options.size,
-          'style': 'position: relative; left: 50%; top: 50px; height: 100px; width: 100px;'
+          'class': 'govuk-c-loader__spinner',
+          'style': 'left: 50%; width: ' + options.size + 'px; height: ' + options.size + 'px; position: absolute; top: 50%;'
+          // 'style': 'position: relative; left: 50%; top: 50px; height: 100px; width: 100px;'
         })
       }
       element.appendChild(spinner)
@@ -178,6 +177,7 @@
       if (options.label) {
         var label = Loader.prototype.createHtmlElement('label', {
           'class': 'govuk-c-loader__label',
+          'role': 'status',
           'aria-live': 'polite',
           'aria-atomic': false
         })
@@ -189,6 +189,7 @@
 
       // Set ARIA attributes to show progress
       if (options.progress) {
+        element.setAttribute('role', 'slider')
         element.setAttribute('aria-valuemin', '0')
         element.setAttribute('aria-valuenow', '0')
         element.setAttribute('aria-valuemax', '100')
