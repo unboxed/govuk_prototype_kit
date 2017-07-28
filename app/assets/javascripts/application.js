@@ -23,6 +23,10 @@ $(document).ready(function () {
     selector: 'js-char-count',
   })
   charCount.init({
+    selector: 'js-word-count',
+    wordCount: true,
+  })
+  charCount.init({
     selector: 'js-char-count-threshold',
     threshold: 50
   })
@@ -31,8 +35,9 @@ $(document).ready(function () {
     highlight: true,
   })
   charCount.init({
-    selector: 'js-word-count',
-    wordCount: true,
+    selector: 'js-char-count-highlight-default-border',
+    highlight: true,
+    defaultBorder: true
   })
 
 })

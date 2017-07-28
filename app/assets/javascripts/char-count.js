@@ -229,13 +229,15 @@
       countMessage.classList.remove('error-message-hidden')
     }
 
-    // Update styles
-    if (remainingNumber < 0) {
-      countElement.classList.add('form-control-error')
-      countMessage.classList.add('error-message')
-    } else {
-      countElement.classList.remove('form-control-error')
-      countMessage.classList.remove('error-message')
+    if (!options.defaultBorder) {
+      // Update styles
+      if (remainingNumber < 0) {
+        countElement.classList.add('form-control-error')
+        countMessage.classList.add('error-message')
+      } else {
+        countElement.classList.remove('form-control-error')
+        countMessage.classList.remove('error-message')
+      }
     }
 
     // Update message
