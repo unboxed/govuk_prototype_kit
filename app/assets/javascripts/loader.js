@@ -142,7 +142,7 @@
         'aria-atomic': false,
         'aria-label': options.labelText,
         'aria-labelledby': 'loading-label', // for generic or updating messages
-        'aria-describedby': 'loading-label',
+        //'aria-describedby': 'loading-label',
         'aria-live': 'polite',
         // 'aria-valuetext': options.labelText, //human readable text alternative of aria-valuenow
         // 'aria-valuemin': '0',
